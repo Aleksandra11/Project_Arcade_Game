@@ -9,7 +9,7 @@ var numCols = 5;
 var numRows = 6;
 var numEnemies = 4;
 var numGems = 3;
-var gameOn = false;      
+var gameOn = false;
 
 function gameTitle() {
     ctx.font="20px Georgia";
@@ -36,7 +36,7 @@ var Enemy = function() {
     this.startX = -tileWidth;
     this.x = this.startX;
     this.y = randomRows();
-}
+};
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
@@ -48,18 +48,18 @@ Enemy.prototype.update = function(dt) {
         this.x = this.startX;
         this.y = randomRows();
     }
-}
+};
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 Enemy.prototype.reset = function() {
     this.speed = baseSpeed + Math.floor(Math.random() * 10) * 20;
     this.startX = -tileWidth;
     this.x = this.startX;
     this.y = randomRows();
-}
+};
 
 // Player class requires an update(), render() and a handleInput() method.
 var Player = function() {
@@ -70,29 +70,29 @@ var Player = function() {
     this.y = this.startY;
     this.points = 0;
     this.lives = 3;
-}
+};
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 Player.prototype.update = function() {
     checkCollisions();
     reachedWater();
-}
+};
 
 // Instantiate objects.
 // Place all enemy objects in an array called allEnemies
 var Lives = function() {
     this.sprite = 'images/Heart.png';
-}
+};
 Lives.prototype.render = function() {
     for(var i = 0; i < player.lives; i++) {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y, tileWidth/2, tileHeight*0.8);
     this.x = 0 + tileWidth*i/2;
     this.y = 40;
     }
-}
+};
 var lives = new Lives();
 var allEnemies = [];
 for(var i = 0; i < numEnemies; i++) {
@@ -113,7 +113,7 @@ Player.prototype.handleInput = function(key){
             if(this.x + tileWidth > numCols * (tileWidth - 1)) return;
                 this.x += tileWidth;
         break;
-        case 'up': 
+        case 'up':
             if (this.y < tileHeight * 0.5) {
                 reachedWater();
             }
@@ -128,11 +128,11 @@ Player.prototype.handleInput = function(key){
         default:
         break;
     }
-}
+};
 Player.prototype.reset = function () {
     this.x = this.startX;
     this.y = this.startY;
-}
+};
 function reachedWater() {
     if(player.lives > 0) {
         if(player.y < tileHeight * 0.5) {
@@ -164,11 +164,11 @@ var Gem = function() {
     this.points = gemPoints();
     this.x = Math.floor(Math.random() * numCols)*tileWidth;
     this.y = randomRows();
-}
+};
 
 Gem.prototype.render = function() {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 //Gem.prototype.update = function() {
 //}
 Gem.prototype.reset = function() {
@@ -176,7 +176,7 @@ Gem.prototype.reset = function() {
     this.points = gemPoints();
     this.x = Math.floor(Math.random() * numCols)*tileWidth;
     this.y = randomRows();
-}
+};
 
 var allGems = [];
 for(var i = 0; i < 1; i++) {
@@ -215,7 +215,7 @@ function checkCollisions() {
 var Message  = function() {
     this.msgs = [];
     this.size = [36];
-}
+};
 
 Message.prototype.render = function() {
     var self = this;
@@ -234,11 +234,11 @@ Message.prototype.render = function() {
             Y = self.size[self.msgs.indexOf(msg)] + 5;
         });
         ctx.restore();
-}
+};
 
 Message.prototype.reset = function() {
     this.size = 36;
-}
+};
 messages = [];
 
 gameOver = function() {
@@ -249,7 +249,7 @@ gameOver = function() {
     state.msgs.push('Game OVER!', 'You got' + ' ' + player.points);
     messages.push(state);
     gameOn = false;
-}
+};
 
 gameReset = function() {
     createTimer(60);
@@ -264,7 +264,7 @@ gameReset = function() {
     });
     messages = [];
     gameOn = true;
-}
+};
 //initial game with click "continue" button
 document.getElementById('continue').addEventListener('click',function(){
         if(!gameOn){
