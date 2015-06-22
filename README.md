@@ -1,6 +1,8 @@
-frontend-nanodegree-arcade-game
-===============================
+Project_Arcade_Game
+Classic Arcade Game Clone
 
-Students should use this rubric: https://www.udacity.com/course/viewer#!/c-ud015/l-3072058665/m-3072588797
+for Udacity Front End Web Developer Nanodegree
 
-for self-checking their submission.
+This project recreates a classic game Frogger using HTML5 Canvas and Object-oriented Javascript.
+
+Can you get more than 8000 points before time runs out? The game is over when the time runs out or you lose your 3 lives (bugs are dangerous and stay away from the water).
