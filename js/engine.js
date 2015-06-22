@@ -24,11 +24,10 @@ var Engine = (function(global) {
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
         lastTime;
-
     canvas.width = 505;
     canvas.height = 606;
-    doc.body.appendChild(canvas);
 
+    doc.body.appendChild(canvas);
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -39,25 +38,25 @@ var Engine = (function(global) {
          * would be the same for everyone (regardless of how fast their
          * computer is) - hurray time!
          */
-        var now = Date.now(),
+        var now = Date.now();
             dt = (now - lastTime) / 1000.0;
-
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        update(dt);
-        render();
+            update(dt);
+            render();
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
          */
-        lastTime = now;
+            lastTime = now;
 
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
-    };
+            win.requestAnimationFrame(main);
+//        }
+    }
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
@@ -79,8 +78,9 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
-        updateEntities(dt);
-        // checkCollisions();
+        if(gameOn) {
+            updateEntities(dt);
+        }
     }
 
     /* This is called by the update function  and loops through all of the
@@ -90,11 +90,14 @@ var Engine = (function(global) {
      * the data/properties related to  the object. Do your drawing in your
      * render methods.
      */
+
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
         player.update();
+        document.getElementById('points').innerHTML = player.points;
+        document.getElementById('lives').innerHTML = player.lives;
     }
 
     /* This function initially draws the "game level", it will then call
@@ -104,6 +107,7 @@ var Engine = (function(global) {
      * they are just drawing the entire screen over and over.
      */
     function render() {
+
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
@@ -135,9 +139,15 @@ var Engine = (function(global) {
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
             }
         }
-
-
         renderEntities();
+        renderInfo();
+    }
+
+    function renderInfo() {
+        messages.forEach(function(message) {
+            message.render();
+        });
+        lives.render();
     }
 
     /* This function is called by the render function and is called on each game
@@ -148,11 +158,13 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
+        allGems.forEach(function(gem){
+            gem.render();
+        });
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
-
-        player.render();
+        player.render();  
     }
 
     /* This function does nothing but it could have been a good place to
@@ -160,7 +172,7 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        gameTitle();
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -172,7 +184,11 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/gem-blue.png',
+        'images/gem-green.png',
+        'images/gem-orange.png',
+        'images/Heart.png'
     ]);
     Resources.onReady(init);
 
