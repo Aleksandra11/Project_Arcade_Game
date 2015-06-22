@@ -78,7 +78,7 @@ Player.prototype.render = function() {
 
 Player.prototype.update = function() {
     checkCollisions();
-    reachedWater();
+    this.reachedWater();
 };
 
 // Instantiate objects.
@@ -115,7 +115,7 @@ Player.prototype.handleInput = function(key){
         break;
         case 'up':
             if (this.y < tileHeight * 0.5) {
-                reachedWater();
+                this.reachedWater();
             }
             else this.y -= tileHeight;
         break;
@@ -133,17 +133,17 @@ Player.prototype.reset = function () {
     this.x = this.startX;
     this.y = this.startY;
 };
-function reachedWater() {
-    if(player.lives > 0) {
-        if(player.y < tileHeight * 0.5) {
-                player.lives--;
-                player.reset();
+Player.prototype.reachedWater = function() {
+    if(this.lives > 0) {
+        if(this.y < tileHeight * 0.5) {
+                this.lives--;
+                this.reset();
         }
     }else{
         gameOver();
         clearInterval(interval);
     }
-}
+};
 
 function randomGemSprite() {
     var gems = [
