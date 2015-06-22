@@ -147,9 +147,9 @@ function reachedWater() {
 
 function randomGemSprite() {
     var gems = [
-    'images/gem-orange.png',
-    'images/gem-blue.png',
-    'images/gem-green.png'
+    'images/Gem Orange.png',
+    'images/Gem Blue.png',
+    'images/Gem Green.png'
     ];
     return gems[Math.floor(Math.random() * 3)];
 }
