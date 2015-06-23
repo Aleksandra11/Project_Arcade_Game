@@ -184,16 +184,14 @@ for(var i = 0; i < 1; i++) {
     allGems.push(gem);
 }
 
-function collectedGems() {
-    allGems.forEach(function(gem) {
-        if(player.y === gem.y && player.x < (gem.x + 60)) {
-            if(player.x > (gem.x - 60)) {
-                player.points += gem.points;
-                gem.reset();
-            }
+Player.prototype.collectedGems = function() {
+    if(this.y === gem.y && this.x < (gem.x + 60)) {
+        if(this.x > (gem.x - 60)) {
+            this.points += gem.points;
+            gem.reset();
         }
-    });
-}
+    }
+};
 
 function checkCollisions() {
     if(player.lives > 0){
@@ -209,7 +207,7 @@ function checkCollisions() {
         gameOver();
         clearInterval(interval);
         }    
-    collectedGems();
+    player.collectedGems();
 }
 
 var Message  = function() {
