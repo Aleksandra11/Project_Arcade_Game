@@ -6,9 +6,7 @@ var firstRow = 68;
 var secondRow = 151;
 var thirdRow = 234;
 var numCols = 5;
-var numRows = 6;
 var numEnemies = 4;
-var numGems = 3;
 var gameOn = false;
 
 function gameTitle() {
@@ -40,7 +38,7 @@ var Enemy = function() {
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
+    // Multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
     this.x +=this.speed * dt;
@@ -77,31 +75,9 @@ Player.prototype.render = function() {
 };
 
 Player.prototype.update = function() {
-    checkCollisions();
+    this.checkCollisions();
     this.reachedWater();
 };
-
-// Instantiate objects.
-// Place all enemy objects in an array called allEnemies
-var Lives = function() {
-    this.sprite = 'images/Heart.png';
-};
-Lives.prototype.render = function() {
-    for(var i = 0; i < player.lives; i++) {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y, tileWidth/2, tileHeight*0.8);
-    this.x = 0 + tileWidth*i/2;
-    this.y = 40;
-    }
-};
-var lives = new Lives();
-var allEnemies = [];
-for(var i = 0; i < numEnemies; i++) {
-    var enemy = new Enemy();
-    allEnemies.push(enemy);
-}
-
-// Place the player object in a variable called player
-var player = new Player();
 
 Player.prototype.handleInput = function(key){
     switch(key) {
@@ -129,10 +105,12 @@ Player.prototype.handleInput = function(key){
         break;
     }
 };
+
 Player.prototype.reset = function () {
     this.x = this.startX;
     this.y = this.startY;
 };
+
 Player.prototype.reachedWater = function() {
     if(this.lives > 0) {
         if(this.y < tileHeight * 0.5) {
@@ -144,6 +122,55 @@ Player.prototype.reachedWater = function() {
         clearInterval(interval);
     }
 };
+
+Player.prototype.collectedGems = function() {
+    if(this.y === gem.y && this.x < (gem.x + 60)) {
+        if(this.x > (gem.x - 60)) {
+            this.points += gem.points;
+            gem.reset();
+        }
+    }
+};
+
+ Player.prototype.checkCollisions = function() {
+    if(this.lives > 0) {
+        allEnemies.forEach(function(enemy) {
+            if(player.y === enemy.y && player.x < (enemy.x + 60)){
+                if(player.x > (enemy.x - 60)) {
+                    player.reset();
+                    player.lives--;
+                }
+            }
+        });
+    }else{
+        gameOver();
+        clearInterval(interval);
+        }
+    this.collectedGems();
+};
+
+// Instantiate objects.
+// Place all enemy objects in an array called allEnemies
+var allEnemies = [];
+for(var i = 0; i < numEnemies; i++) {
+    var enemy = new Enemy();
+    allEnemies.push(enemy);
+}
+
+// Place the player object in a variable called player
+var player = new Player();
+
+var Lives = function() {
+    this.sprite = 'images/Heart.png';
+};
+Lives.prototype.render = function() {
+    for(var i = 0; i < player.lives; i++) {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y, tileWidth/2, tileHeight*0.8);
+    this.x = 0 + tileWidth*i/2;
+    this.y = 40;
+    }
+};
+var lives = new Lives();
 
 function randomGemSprite() {
     var gems = [
@@ -182,32 +209,6 @@ var allGems = [];
 for(var i = 0; i < 1; i++) {
     var gem = new Gem();
     allGems.push(gem);
-}
-
-Player.prototype.collectedGems = function() {
-    if(this.y === gem.y && this.x < (gem.x + 60)) {
-        if(this.x > (gem.x - 60)) {
-            this.points += gem.points;
-            gem.reset();
-        }
-    }
-};
-
-function checkCollisions() {
-    if(player.lives > 0){
-        allEnemies.forEach(function(enemy) {
-            if(player.y === enemy.y && player.x < (enemy.x + 60)){
-                if(player.x > (enemy.x - 60)) {
-                    player.reset();
-                    player.lives--;
-                }
-            }
-        });
-    }else{
-        gameOver();
-        clearInterval(interval);
-        }    
-    player.collectedGems();
 }
 
 var Message  = function() {
@@ -279,6 +280,7 @@ function makeWhite(x, y, w, h) {
     ctx.fillStyle = "white";
     ctx.fill();
 }
+
 function createTimer(seconds) {
     interval = setInterval(function () {
         makeWhite(400, 20, 100, 80);
@@ -310,7 +312,7 @@ function createTimer(seconds) {
     }, 1000);
 }
 
-// This listens for key presses and sends the keys to your
+// This listens for key presses and sends the keys to
 // Player.handleInput() method. You don't need to modify this.
 
 document.addEventListener('keyup', function(e) {
