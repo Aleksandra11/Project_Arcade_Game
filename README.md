@@ -12,3 +12,8 @@ Can you get more than 8000 points before time runs out? The game is over when th
 To play again, simply click button "start game" on screen.
 
 View live demostration site at http://aleksandra11.github.io/Project_Arcade_Game/
+
+HOW to run the game Instruction: 
+1.Clone the project on your machine
+2.Open the file"index.html" in your favorite browser
+3.Play the game
