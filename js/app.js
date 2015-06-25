@@ -1,4 +1,8 @@
-// Enemies our player must avoid
+'use strict';
+
+// A few variables are created and values are assigned to them.
+//The value of gameOn is set to false at the beginning.
+//Initial game with click "start game" button
 var tileWidth = 101;
 var tileHeight = 83;
 var baseSpeed = 100;
@@ -8,6 +12,7 @@ var thirdRow = 234;
 var numCols = 5;
 var numEnemies = 4;
 var gameOn = false;
+var messages, gameOver, gameReset;
 
 function gameTitle() {
     ctx.font="20px Georgia";
@@ -25,9 +30,10 @@ function gameTitle() {
 
 function randomRows() {
     var rows = [firstRow, secondRow, thirdRow];
-    return rows[Math.floor(Math.random() * 3)];//return a random y coordinate
+    return rows[Math.floor(Math.random() * 3)];   //return a random y coordinate
 }
 
+//Enemies our player must avoid
 var Enemy = function() {
     this.sprite = 'images/enemy-bug.png';
     this.speed = baseSpeed + Math.floor(Math.random() * 10) * 20;
@@ -42,6 +48,8 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
     this.x +=this.speed * dt;
+    //Once an enemy bug reaches the right border, reset it's 
+    //position on the left
     if(this.x > tileWidth * numCols) {
         this.x = this.startX;
         this.y = randomRows();
@@ -52,6 +60,8 @@ Enemy.prototype.update = function(dt) {
 Enemy.prototype.render = function() {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
+
+//Reset the enemie's position and speed to a new random values
 Enemy.prototype.reset = function() {
     this.speed = baseSpeed + Math.floor(Math.random() * 10) * 20;
     this.startX = -tileWidth;
@@ -66,19 +76,22 @@ var Player = function() {
     this.startY = 400;
     this.x = this.startX;
     this.y = this.startY;
-    this.points = 0;
-    this.lives = 3;
+    this.points = 0;         //initial score
+    this.lives = 3;          //initial lives at the beginning
 };
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+//The function is called by the function updateEntities() in engine.js
 Player.prototype.update = function() {
     this.checkCollisions();
     this.reachedWater();
 };
 
+//Keycode control player's movement
+//Player can't go out of the canvas border
 Player.prototype.handleInput = function(key){
     switch(key) {
         case 'left':
@@ -106,60 +119,65 @@ Player.prototype.handleInput = function(key){
     }
 };
 
+//Method is called after collision with enemies or gem, and
+//if player gets into water. Reset the player to the initial position
 Player.prototype.reset = function () {
     this.x = this.startX;
     this.y = this.startY;
 };
 
+//Called by player.update()
 Player.prototype.reachedWater = function() {
     if(this.lives > 0) {
         if(this.y < tileHeight * 0.5) {
-                this.lives--;
-                this.reset();
+                this.lives--;         //player lose one live if "fall" into water
+                this.reset();         //player at the start position
         }
     }else{
         gameOver();
-        clearInterval(interval);
+        clearInterval(interval);    //stop the timer if player lost all lives
     }
 };
 
 Player.prototype.collectedGems = function() {
     if(this.y === gem.y && this.x < (gem.x + 60)) {
-        if(this.x > (gem.x - 60)) {
-            this.points += gem.points;
+        if(this.x > (gem.x - 60)) {       //if collision with gem
+            this.points += gem.points;    //add points to the player score
             gem.reset();
         }
     }
 };
 
- Player.prototype.checkCollisions = function() {
-    if(this.lives > 0) {
-        allEnemies.forEach(function(enemy) {
+//Called by player.update(), defines checkCollisions() method
+Player.prototype.checkCollisions = function() {
+    if(this.lives > 0) {                      //if the condition returns true
+        allEnemies.forEach(function(enemy) {  //and checks for enemie's relative position to the player
             if(player.y === enemy.y && player.x < (enemy.x + 60)){
                 if(player.x > (enemy.x - 60)) {
-                    player.reset();
-                    player.lives--;
+                    player.reset();           //return player to his initial position
+                    player.lives--;           //player lost one live
                 }
             }
         });
-    }else{
-        gameOver();
-        clearInterval(interval);
+    }else{                                   //if player has no lives
+        gameOver();                          //calls gameOver (player lost all lives)
+        clearInterval(interval);             //stops countdown timer
         }
-    this.collectedGems();
+    this.collectedGems();                    //checks player-gem collision
 };
 
 // Instantiate objects.
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [];
-for(var i = 0; i < numEnemies; i++) {
-    var enemy = new Enemy();
-    allEnemies.push(enemy);
+for(var i = 0; i < numEnemies; i++) {    //loop through the iteams in the array
+    var enemy = new Enemy();             //create enemy object
+    allEnemies.push(enemy);              //add the enemy to the allEnemies array
 }
 
 // Place the player object in a variable called player
 var player = new Player();
 
+//Hearts appear at the left top coner to indicate the player's lives
 var Lives = function() {
     this.sprite = 'images/Heart.png';
 };
@@ -172,6 +190,7 @@ Lives.prototype.render = function() {
 };
 var lives = new Lives();
 
+//returns random gem sprite
 function randomGemSprite() {
     var gems = [
     'images/Gem Orange.png',
@@ -186,6 +205,7 @@ function gemPoints() {
     return points[Math.floor(Math.random() * 3)];
 }
 
+//Define Gem class. One gem will randomly appear on the stone-block area
 var Gem = function() {
     this.sprite = randomGemSprite();
     this.points = gemPoints();
@@ -205,12 +225,14 @@ Gem.prototype.reset = function() {
     this.y = randomRows();
 };
 
+//Place all gems objects in an array called allGems
 var allGems = [];
 for(var i = 0; i < 1; i++) {
     var gem = new Gem();
     allGems.push(gem);
 }
 
+//
 var Message  = function() {
     this.msgs = [];
     this.size = [36];
@@ -218,10 +240,10 @@ var Message  = function() {
 
 Message.prototype.render = function() {
     var self = this;
-    Y = 0;
+    var Y = 0;
     this.x = ctx.canvas.width / 3;
     this.y = ctx.canvas.height / 2;
-        ctx.save();
+        ctx.save();                               //save the default state of the canvas onto a stack before modifying it
         ctx.shadowColor = 'rgba(0,0,0,0.6)';
         ctx.textAlign = 'left';
         ctx.lineWidth = 2;
@@ -232,47 +254,51 @@ Message.prototype.render = function() {
             ctx.strokeText(msg, self.x, self.y + Y);
             Y = self.size[self.msgs.indexOf(msg)] + 5;
         });
-        ctx.restore();
+        ctx.restore();                            //restore the default state
 };
 
 Message.prototype.reset = function() {
     this.size = 36;
 };
+
 messages = [];
 
+//Called by checkCollisions() function. Displays the game over message
 gameOver = function() {
     var state;
-    state = new Message();
+    state = new Message();                  //create new message
     state.reset();
     state.size = [36, 56];
     state.msgs.push('Game OVER!', 'You got' + ' ' + player.points);
-    messages.push(state);
-    gameOn = false;
+    messages.push(state);                   //adds game over message to the array
+    gameOn = false;                         //stop the game
 };
 
+//Reset the game to the initial values it had. Called once we receive the mouse click to start game
 gameReset = function() {
-    createTimer(60);
-    player.points = 0;
-    player.lives = 3;
-    player.reset();
-    allEnemies.forEach(function(enemy) {
-        enemy.reset();
+    createTimer(60);                      //start the game timer
+    player.points = 0;                    //sets player points to 0
+    player.lives = 3;                     //player gets 3 lives
+    player.reset();                       //player position
+    allEnemies.forEach(function(enemy) {   //reset the enemie's location for
+        enemy.reset();                     //each enemy in an array
     });
-    allGems.forEach(function(gem) {
+    allGems.forEach(function(gem) {        //for each gem call reset function
         gem.reset();
     });
-    messages = [];
-    gameOn = true;
+    messages = [];                        //array for messages
+    gameOn = true;                        //the value of gameOn now is true
 };
-//initial game with click "continue" button
+
+//initial game with click "start game" button
 document.getElementById('continue').addEventListener('click',function(){
         if(!gameOn){
             gameReset();
         }
     });
 
-//Create countdown timer for the game
-var interval;
+//Create countdown timer (60 sec) for the game
+var interval;                                   //used to store the timer
 function makeWhite(x, y, w, h) {
     ctx.beginPath();
     ctx.rect(x, y, w, h);
@@ -280,13 +306,13 @@ function makeWhite(x, y, w, h) {
     ctx.fillStyle = "white";
     ctx.fill();
 }
-
+//Start timer to run an anonymous function every second
 function createTimer(seconds) {
     interval = setInterval(function () {
         makeWhite(400, 20, 100, 80);
         if(seconds === 0) {
-            clearInterval(interval);
-            gameOver();
+            clearInterval(interval);           //clear timer if time is up
+            gameOver();                        //call gameOver() function
             ctx.font = "20px Arial";
             ctx.fillStyle = "red";
             ctx.textAlign = "center";
@@ -295,25 +321,25 @@ function createTimer(seconds) {
             return;
         }
         ctx.font = "20px Arial";
-        if(seconds <= 10) {
+        if(seconds <= 10) {                  //if less then 10 seconds make timer text red
             ctx.fillStyle = "red";
         }else{
-            ctx.fillStyle = "blue";
+            ctx.fillStyle = "blue";          //color for the timer is blue
         }
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        var minites = Math.floor(seconds / 60);
-        var secondsShow = (seconds - minites * 60).toString();
-        if(secondsShow.length === 1) {
-            secondsShow = "0" + secondsShow;
+        var minites = Math.floor(seconds / 60);  //calculate the remaining minutes
+        var secondsShow = (seconds - minites * 60).toString(); //calculate seconds
+        if(secondsShow.length === 1) {           //if the number of seconds < 10, then
+            secondsShow = "0" + secondsShow;     // it will be shown after '0'
         }
         ctx.fillText(minites.toString() + ":" + secondsShow, 470, 40);
         seconds--;
-    }, 1000);
+    }, 1000);                                   //milliseconds timer will wait
 }
 
 // This listens for key presses and sends the keys to
-// Player.handleInput() method. You don't need to modify this.
+// Player.handleInput() method.
 
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
